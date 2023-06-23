@@ -19,6 +19,7 @@ const (
 	CQL
 	ClickHouse
 	Presto
+	FireBird
 )
 
 var (
@@ -58,6 +59,8 @@ func (f Flavor) String() string {
 		return "ClickHouse"
 	case Presto:
 		return "Presto"
+	case FireBird:
+		return "FireBird"
 	}
 
 	return "<invalid>"
@@ -84,6 +87,8 @@ func (f Flavor) Interpolate(sql string, args []interface{}) (string, error) {
 		return clickhouseInterpolate(sql, args...)
 	case Presto:
 		return prestoInterpolate(sql, args...)
+	case FireBird:
+		return firebirdInterpolate(sql, args...)
 	}
 
 	return "", ErrInterpolateNotImplemented
@@ -140,7 +145,7 @@ func (f Flavor) Quote(name string) string {
 	switch f {
 	case MySQL, ClickHouse:
 		return fmt.Sprintf("`%s`", name)
-	case PostgreSQL, SQLServer, SQLite, Presto:
+	case PostgreSQL, SQLServer, SQLite, Presto, FireBird:
 		return fmt.Sprintf(`"%s"`, name)
 	case CQL:
 		return fmt.Sprintf("'%s'", name)
@@ -166,7 +171,7 @@ func (f Flavor) PrepareInsertIgnore(table string, ib *InsertBuilder) {
 		// see https://www.sqlite.org/lang_insert.html
 		ib.verb = "INSERT OR IGNORE"
 
-	case ClickHouse, CQL, SQLServer, Presto:
+	case ClickHouse, CQL, SQLServer, Presto, FireBird:
 		// All other databases do not support insert ignore
 		ib.verb = "INSERT"
 

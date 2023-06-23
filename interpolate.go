@@ -399,6 +399,10 @@ func prestoInterpolate(query string, args ...interface{}) (string, error) {
 	return mysqlLikeInterpolate(Presto, query, args...)
 }
 
+func firebirdInterpolate(query string, args ...interface{}) (string, error) {
+	return mysqlLikeInterpolate(FireBird, query, args...)
+}
+
 func encodeValue(buf []byte, arg interface{}, flavor Flavor) ([]byte, error) {
 	switch v := arg.(type) {
 	case nil:
@@ -423,7 +427,7 @@ func encodeValue(buf []byte, arg interface{}, flavor Flavor) ([]byte, error) {
 		buf = append(buf, '\'')
 
 		switch flavor {
-		case MySQL:
+		case MySQL, FireBird:
 			buf = append(buf, v.Format("2006-01-02 15:04:05.999999")...)
 
 		case PostgreSQL:
@@ -526,7 +530,7 @@ func encodeValue(buf []byte, arg interface{}, flavor Flavor) ([]byte, error) {
 			}
 
 			switch flavor {
-			case MySQL:
+			case MySQL, FireBird:
 				buf = append(buf, "_binary"...)
 				buf = quoteStringValue(buf, *(*string)(unsafe.Pointer(&data)), flavor)
 

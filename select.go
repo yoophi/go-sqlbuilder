@@ -238,6 +238,21 @@ func (sb *SelectBuilder) BuildWithFlavor(flavor Flavor, initialArg ...interface{
 	sb.injection.WriteTo(buf, selectMarkerInit)
 	buf.WriteString("SELECT ")
 
+	switch flavor {
+	case FireBird:
+		if sb.limit >= 0 {
+			buf.WriteString("FIRST ")
+			buf.WriteString(strconv.Itoa(sb.limit))
+			buf.WriteString(" ")
+
+			if sb.offset > 0 {
+				buf.WriteString("SKIP ")
+				buf.WriteString(strconv.Itoa(sb.offset))
+				buf.WriteString(" ")
+			}
+		}
+	}
+
 	if sb.distinct {
 		buf.WriteString("DISTINCT ")
 	}
